@@ -1,6 +1,6 @@
 FROM dynverse/dynwrap:bioc
 
-LABEL version 0.1.0.1
+LABEL version 0.1.0
 
 RUN R -e 'devtools::install_cran("destiny")'
 
@@ -19,4 +19,4 @@ RUN cd CALISTA; wget https://gist.githubusercontent.com/rcannood/ed97cacc2f373de
 
 ADD . /code
 
-ENTRYPOINT /code/run.sh
+ENTRYPOINT Rscript /code/run.R
