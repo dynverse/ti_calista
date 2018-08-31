@@ -12,6 +12,7 @@ From: dynverse/dynwrap:bioc
 
 %post
     chmod -R a+r /code
+    chmod a+x /code
     R -e 'devtools::install_cran("destiny")'
     git clone https://github.com/CABSEL/CALISTA.git; rm -rf CALISTA/.git; find CALISTA -type f \( -iname \*.zip -o -iname \*.csv -o -iname \*.txt \) -exec rm {} +
     apt-get update && apt-get install -y libcgal-dev libglu1-mesa-dev libglu1-mesa-dev libjpeg-dev libtiff-dev tcl-dev
