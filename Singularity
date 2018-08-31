@@ -8,19 +8,23 @@ Bootstrap: shub
 From: dynverse/dynwrap:bioc
 
 %labels
-    version 0.1.1
-
-%post
-    chmod -R a+r /code
-    chmod a+x /code
-    R -e 'devtools::install_cran("destiny")'
-    git clone https://github.com/CABSEL/CALISTA.git; rm -rf CALISTA/.git; find CALISTA -type f \( -iname \*.zip -o -iname \*.csv -o -iname \*.txt \) -exec rm {} +
-    apt-get update && apt-get install -y libcgal-dev libglu1-mesa-dev libglu1-mesa-dev libjpeg-dev libtiff-dev tcl-dev
-    Rscript CALISTA/CALISTA-R/install_packs.R
-    cd CALISTA; wget https://gist.githubusercontent.com/rcannood/ed97cacc2f373de6f3a6bb7320e2c677/raw/935044855cd204aee6eba821367b95669bb14784/calista.patch; patch -p0 calista.patch
+    version 0.1.2
 
 %files
     . /code
+
+%post
+    chmod -R 755 '/code'
+    R -e 'devtools::install_cran("destiny")'
+    apt-get update && apt-get install -y libcgal-dev libglu1-mesa-dev libglu1-mesa-dev libjpeg-dev libtiff-dev tcl-dev patch
+    cd / && \
+      git clone https://github.com/CABSEL/CALISTA.git && \
+      cd CALISTA && \
+      rm -rf .git && \
+      find . -type f \( -iname \*.zip -o -iname \*.csv -o -iname \*.txt \) -exec rm {} + && \
+      wget https://gist.githubusercontent.com/rcannood/ed97cacc2f373de6f3a6bb7320e2c677/raw/935044855cd204aee6eba821367b95669bb14784/calista.patch && \
+      patch -p0 /code/calista.patch
+    Rscript /CALISTA/CALISTA-R/install_packs.R
 
 %runscript
     exec Rscript /code/run.R
