@@ -8,9 +8,10 @@ Bootstrap: shub
 From: dynverse/dynwrap:bioc
 
 %labels
-    version 0.1.0
+    version 0.1.1
 
 %post
+    chmod -R a+r /code
     R -e 'devtools::install_cran("destiny")'
     git clone https://github.com/CABSEL/CALISTA.git; rm -rf CALISTA/.git; find CALISTA -type f \( -iname \*.zip -o -iname \*.csv -o -iname \*.txt \) -exec rm {} +
     apt-get update && apt-get install -y libcgal-dev libglu1-mesa-dev libglu1-mesa-dev libjpeg-dev libtiff-dev tcl-dev
