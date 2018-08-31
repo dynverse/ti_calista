@@ -8,7 +8,7 @@ Bootstrap: shub
 From: dynverse/dynwrap:bioc
 
 %labels
-    version 0.1.2
+    version 0.1.3
 
 %files
     . /code
@@ -23,7 +23,7 @@ From: dynverse/dynwrap:bioc
       rm -rf .git && \
       find . -type f \( -iname \*.zip -o -iname \*.csv -o -iname \*.txt \) -exec rm {} + && \
       wget https://gist.githubusercontent.com/rcannood/ed97cacc2f373de6f3a6bb7320e2c677/raw/935044855cd204aee6eba821367b95669bb14784/calista.patch && \
-      patch -p0 /code/calista.patch
+      patch -p0 calista.patch
     Rscript /CALISTA/CALISTA-R/install_packs.R
 
 %runscript
