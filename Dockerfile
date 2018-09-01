@@ -14,11 +14,11 @@ RUN cd / && \
     rm -rf .git && \
     find . -type f \( -iname \*.zip -o -iname \*.csv -o -iname \*.txt \) -exec rm {} + && \
     wget https://gist.githubusercontent.com/rcannood/ed97cacc2f373de6f3a6bb7320e2c677/raw/935044855cd204aee6eba821367b95669bb14784/calista.patch && \
-    patch -p0 calista.patch
+    patch -p0 < calista.patch
 
 RUN Rscript /CALISTA/CALISTA-R/install_packs.R
 
-LABEL version 0.1.3
+LABEL version 0.1.4
 
 ADD . /code
 
