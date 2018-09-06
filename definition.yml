@@ -1,6 +1,7 @@
 id: calista
 docker_repository: dynverse/ti_calista
 container_url: https://github.com/dynverse/ti_calista
+singularity_collection: 1534
 name: CALISTA
 type: algorithm
 platform: R
