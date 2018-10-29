@@ -18,7 +18,7 @@ RUN cd / && \
 
 RUN Rscript /CALISTA/CALISTA-R/install_packs.R
 
-LABEL version 0.1.5
+LABEL version 0.1.7
 
 ADD . /code
 
