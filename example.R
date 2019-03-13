@@ -18,4 +18,4 @@ data$seed <- 1
 
 # write example dataset to file
 file <- commandArgs(trailingOnly = TRUE)[[1]]
-dynutils::write_h5(data[c("counts", "expression", "params", "prior_information")], file)
+dynutils::write_h5(data, file)
