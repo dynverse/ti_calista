@@ -6,7 +6,8 @@ data <- dyntoy::generate_dataset(
   id = "specific_example/calista",
   num_cells = 300,
   num_features = 101,
-  model = "bifurcating"
+  model = "bifurcating",
+  normalise = FALSE
 )
 
 # add method specific args (if needed)
