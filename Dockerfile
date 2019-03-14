@@ -18,6 +18,6 @@ RUN cd / && \
 RUN Rscript /CALISTA/CALISTA-R/install_packs.R && \
     rm -rf /tmp/*
 
-COPY run.R definition.yml example.R /code/
+COPY run.R definition.yml example.sh /code/
 
 ENTRYPOINT ["/code/run.R"]
