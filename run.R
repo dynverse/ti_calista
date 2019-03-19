@@ -20,7 +20,7 @@ source("R/initialization.R")
 ###           LOAD DATA           ###
 #####################################
 expression <- task$expression
-params <- task$params
+parameters <- task$parameters
 priors <- task$priors
 
 file_loc <- tempfile(pattern = "expression.csv")
@@ -63,8 +63,8 @@ INPUTS$Cluster='kmedoids'; # Use k-medoids in consensus clustering
 INPUTS$thr_transition_genes=50; # Set threshold for transition genes determination to
 
 # put parameters into INPUTS
-INPUTS$runs=params$runs; # Perform 50 independent runs of greedy algorithm
-INPUTS$max_iter=params$max_iter; # Limit the number of iterations in greedy algorithm to 100
+INPUTS$runs=parameters$runs; # Perform 50 independent runs of greedy algorithm
+INPUTS$max_iter=parameters$max_iter; # Limit the number of iterations in greedy algorithm to 100
 
 # % Upload and pre-process data
 DATA=import_data(INPUTS)
