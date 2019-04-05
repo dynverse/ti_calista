@@ -1,39 +1,46 @@
-library(dplyr)
-library(purrr)
-library(readr)
-library(feather)
+#!/usr/local/bin/Rscript
+
+task <- dyncli::main()
+
+# load libraries
+library(dyncli, warn.conflicts = FALSE)
+library(dynwrap, warn.conflicts = FALSE)
+library(dplyr, warn.conflicts = FALSE)
+library(purrr, warn.conflicts = FALSE)
+library(readr, warn.conflicts = FALSE)
 
 # calista NEEDS to be in the CALISTA-R folder while at the same time
 # requiring to be able to write files there
-file.copy("/CALISTA/CALISTA-R", "/ti/workspace", recursive = TRUE)
-setwd("/ti/workspace/CALISTA-R")
+tmpdir <- dynutils::safe_tempdir("workspace")
+file.copy("/CALISTA/CALISTA-R", tmpdir, recursive = TRUE)
+setwd(paste0(tmpdir, "/CALISTA-R"))
 source("R/initialization.R")
 
-#   ____________________________________________________________________________
-#   Load data                                                               ####
+#####################################
+###           LOAD DATA           ###
+#####################################
+expression <- task$expression
+parameters <- task$parameters
+priors <- task$priors
 
-data <- read_rds("/ti/input/data.rds")
-params <- jsonlite::read_json("/ti/input/params.json")
-
-#' @examples
-#' data <- dyntoy::generate_dataset(model = "cyclic") %>% c(., .$prior_information)
-#' params <- yaml::read_yaml("containers/calista/definition.yml")$parameters %>%
-#'   {.[names(.) != "forbidden"]} %>%
-#'   map(~ .$default)
-#' setwd("~/Downloads/CALISTA/CALISTA-R/")
-
-expression <- data$expression
 file_loc <- tempfile(pattern = "expression.csv")
 
 data_df <- data.frame(
   row.names = NULL,
-  expression,
+  as.matrix(expression),
   check.names = FALSE
 )
 write_csv(data_df, file_loc)
 
-#   ____________________________________________________________________________
-#   Infer trajectory                                                        ####
+# TIMING: done with preproc
+timings <- list(method_afterpreproc = Sys.time())
+
+#####################################
+###        INFER TRAJECTORY       ###
+#####################################
+
+# based on an example script available at
+# https://github.com/CABSEL/CALISTA/tree/367d5bdbfa80796145a9feba0f1dffb144ac67bc/CALISTA-R/EXAMPLES/RNA-seq
 
 
 # Prepare CALISTA for work
@@ -56,13 +63,11 @@ INPUTS$Cluster='kmedoids'; # Use k-medoids in consensus clustering
 INPUTS$thr_transition_genes=50; # Set threshold for transition genes determination to
 
 # put parameters into INPUTS
-INPUTS$runs=params$runs; # Perform 50 independent runs of greedy algorithm
-INPUTS$max_iter=params$max_iter; # Limit the number of iterations in greedy algorithm to 100
+INPUTS$runs=parameters$runs; # Perform 50 independent runs of greedy algorithm
+INPUTS$max_iter=parameters$max_iter; # Limit the number of iterations in greedy algorithm to 100
 
 # % Upload and pre-process data
 DATA=import_data(INPUTS)
-
-checkpoints <- list(method_afterpreproc = as.numeric(Sys.time()))
 
 # %% *** 2-SINGLE-CELL CLUSTERING ***
 # %
@@ -94,10 +99,12 @@ Results=CALISTA_transition_genes_main(DATA,INPUTS,Results)
 #
 Results=CALISTA_ordering_main(DATA,Results)
 
-# TIMING: done with method
-checkpoints$method_aftermethod <- as.numeric(Sys.time())
+# TIMING: done with trajectory inference
+timings$method_aftermethod <- Sys.time()
 
-# CREATE OUTPUT
+#####################################
+###     SAVE OUTPUT TRAJECTORY    ###
+#####################################
 milestone_network <- inner_join(data.frame(Results$TRANSITION$nodes_connection), data.frame(Results$cluster_distance), by = c("X1", "X2")) %>%
   dplyr::select(from = X1, to = X2, length = X3) %>%
   mutate(directed = FALSE)
@@ -128,11 +135,16 @@ milestone_network <- milestone_network %>%
 progressions <- progressions %>%
   mutate(from = paste0("M", from), to = paste0("M", to))
 
-output <- lst(
-  cell_ids = unique(progressions$cell_id),
-  progressions,
-  milestone_network,
-  timings = checkpoints
-)
+output <-
+  wrap_data(
+    cell_ids = unique(progressions$cell_id)
+  ) %>%
+  add_trajectory(
+    milestone_network = milestone_network,
+    progressions = progressions
+  ) %>%
+  add_timings(
+    timings = timings
+  )
 
-write_rds(output, "/ti/output/output.rds")
+dyncli::write_output(output, task$output)
