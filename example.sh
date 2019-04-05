@@ -15,7 +15,7 @@ data$parameters <- list(
   runs = 3,
   max_iter = 5
 )
-data$seed <- 1
+data$seed <- 1L
 
 # write example dataset to file
 file <- commandArgs(trailingOnly = TRUE)[[1]]
